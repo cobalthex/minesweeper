@@ -103,6 +103,9 @@
             .tile.mine::before {
                 content: '💣';
             }
+            .tile.mine.flag::before {
+                content: '🏴‍☠️';
+            }
             .tile.fail {
                 cursor: initial;
                 border-color: #d40;
@@ -245,10 +248,26 @@
 
         var Sweep = function(coord)
         {
+            var isFirst = (tilesRemaining == size.row * size.col - mineCount);
             switch (board[coord.row * size.col + coord.col])
             {
                 case TILE_MINE:
-                EndGame(false);
+                if (isFirst)
+                {
+                    var r = Math.trunc(Math.random() * Math.floor(size.row));
+                    var c = Math.trunc(Math.random() * Math.floor(size.col));
+                    if (board[r * size.col + c] == TILE_MINE)
+                    {
+                        --mineCount;
+                        ++tilesRemaining;
+                    }
+                    else
+                        board[r * size.col + c] = TILE_MINE;
+                    board[coord.row * size.col + coord.col] = TILE_EMPTY_UNREVEALED;
+                    Fill(coord);
+                }
+                else
+                    EndGame(false);
                 break;
 
                 default:
